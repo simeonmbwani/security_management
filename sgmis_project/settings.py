@@ -125,7 +125,6 @@ AUTH_USER_MODEL = "accounts.User"
 # create tables directly against SQLite when the app folders have no migration
 # files yet.
 MIGRATION_MODULES = {
-    "accounts": None,
     "occurrence_book": None,
     "patrols": None,
     "shifts": None,
