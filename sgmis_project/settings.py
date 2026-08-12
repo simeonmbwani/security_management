@@ -83,61 +83,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "sgmis_project.wsgi.application"
 ASGI_APPLICATION = "sgmis_project.asgi.application"
 
-DB_ENGINE = config("DB_ENGINE", default="sqlite3")
+import dj_database_url
 
-if DB_ENGINE == "postgresql":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": config("DB_NAME", default="sgmis"),
-            "USER": config("DB_USER", default="simeonmbwani"),
-            "PASSWORD": config("DB_PASSWORD", default="@A1n2d3y4"),
-            "HOST": config("DB_HOST", default="127.0.0.1"),
-            "PORT": config("DB_PORT", default="5432"),
-        }
-    }
-else:
-   DATABASES = {
+# Database configuration: Uses Render's PostgreSQL via DATABASE_URL if available, 
+# otherwise falls back to a local SQLite database for development.
+DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
         ssl_require=True,
     )
 }
-   
-   import dj_database_url
-import os
-
-# ...
-
-DATABASES = {
-    'default': dj_database_url.config(
-        # If DATABASE_URL environment variable exists (Render), use it. 
-        # Otherwise, fallback to a local SQLite database for your PC.
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-    )
-}
 
 AUTH_USER_MODEL = "accounts.User"
-
-# Development fallback: disable app migrations so the project can boot and
-# create tables directly against SQLite when the app folders have no migration
-# files yet.
-MIGRATION_MODULES = {
-    "occurrence_book": None,
-    "patrols": None,
-    "shifts": None,
-    "leave_management": None,
-    "exam_management": None,
-    "escort_management": None,
-    "incidents": None,
-    "visitors": None,
-    "registers": None,
-    "notifications": None,
-    "reports": None,
-}
-
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
