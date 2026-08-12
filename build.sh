@@ -1,14 +1,23 @@
-#!/usr/init/env bash
+#!/usr/bin/env bash
 # Exit on error
 set -o errexit
 
+# Install dependencies
 pip install -r requirements.txt
 
-# Run accounts migration explicitly first so accounts_user exists
-python manage.py migrate accounts --no-input
+# Run database migrations
+python manage.py migrate
 
-# Run the rest of the migrations
-python manage.py migrate --no-input
+# Automatically create a default superuser if none exists
+python manage.py shell -c "
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(is_superuser=True).exists():
+    User.objects.create_superuser('simeonmbwani', 'simeonmbwani@gmail.com', '@A1n2d3y4')
+    print('Superuser created successfully.')
+else:
+    print('Superuser already exists.')
+"
 
-# Collect static files last
+# Collect static files (if applicable)
 python manage.py collectstatic --no-input
