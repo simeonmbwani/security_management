@@ -83,18 +83,20 @@ TEMPLATES = [
 WSGI_APPLICATION = "sgmis_project.wsgi.application"
 ASGI_APPLICATION = "sgmis_project.asgi.application"
 
+import os
 import dj_database_url
 
-# Database configuration: Uses Render's PostgreSQL via DATABASE_URL if available, 
-# otherwise falls back to a local SQLite database for development.
+# Get the URL, defaulting to local SQLite if not found
+db_url = os.environ.get('DATABASE_URL', f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=db_url,
         conn_max_age=600,
-        ssl_require=True,
+        # Only require SSL if we are connecting to a PostgreSQL database
+        ssl_require=db_url.startswith('postgres'),
     )
 }
-
 AUTH_USER_MODEL = "accounts.User"
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
